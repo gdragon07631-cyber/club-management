@@ -1,0 +1,77 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-club_root_local}
+      MYSQL_DATABASE: club_db
+      MYSQL_USER: club_user
+      MYSQL_PASSWORD: ${DB_PASSWORD:-club_password}
+    volumes:
+      - club_db_data:/var/lib/mysql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-club_root_local}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - club_net
+
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_NAME: club_db
+      DB_USER: club_user
+      DB_PASSWORD: ${DB_PASSWORD:-club_password}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3001:3000"
+    networks:
+      - club_net
+
+  prometheus:
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9091:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - club_prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    depends_on:
+      - app
+    networks:
+      - club_net
+
+
+  grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3002:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-clubGrafana_2026}
+    volumes:
+      - club_grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - club_net
+
+volumes:
+  club_db_data:
+  club_grafana_data:
+  club_prometheus_data:
+
+networks:
+  club_net:

@@ -1,0 +1,13 @@
+{
+  "name": "club-management",
+  "version": "1.0.0",
+  "description": "He thong quan ly cau lac bo",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "mysql2": "^3.14.0"
+  }
+}
