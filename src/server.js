@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 
 const app = express();
+app.disable('x-powered-by');
 const PORT = Number(process.env.PORT || 3000);
 
 app.use(express.json());
