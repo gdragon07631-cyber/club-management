@@ -129,10 +129,35 @@ services:
     networks:
       - club_net
 
+  loki:
+    image: grafana/loki:3.4.2
+    restart: unless-stopped
+    command: ["-config.file=/etc/loki/loki.yaml"]
+    volumes:
+      - ./logging/loki.yaml:/etc/loki/loki.yaml:ro
+      - club_loki_data:/loki
+    networks:
+      - club_net
+
+  promtail:
+    image: grafana/promtail:3.4.2
+    restart: unless-stopped
+    command: ["-config.file=/etc/promtail/promtail.yaml"]
+    volumes:
+      - ./logging/promtail.yaml:/etc/promtail/promtail.yaml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - club_promtail_positions:/positions
+    depends_on:
+      - loki
+    networks:
+      - club_net
+
 volumes:
   club_db_data:
   club_grafana_data:
   club_prometheus_data:
+  club_loki_data:
+  club_promtail_positions:
 
 networks:
   club_net:
