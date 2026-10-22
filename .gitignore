@@ -7,3 +7,4 @@ club_db_backup.sql
 club_db_backup.sql
 nginx/certs/*.key
 monitoring/mysqld.cnf
+club_db_backup_truoc_doi_mk.sql

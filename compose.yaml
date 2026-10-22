@@ -3,15 +3,15 @@ services:
     image: mysql:8.0
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-club_root_local}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?thieu_trong_env}
       MYSQL_DATABASE: club_db
       MYSQL_USER: club_user
-      MYSQL_PASSWORD: ${DB_PASSWORD:-club_password}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?thieu_trong_env}
     volumes:
       - club_db_data:/var/lib/mysql
       - ./sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-club_root_local}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:?thieu_trong_env}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -27,7 +27,7 @@ services:
       DB_HOST: db
       DB_NAME: club_db
       DB_USER: club_user
-      DB_PASSWORD: ${DB_PASSWORD:-club_password}
+      DB_PASSWORD: ${DB_PASSWORD:?thieu_trong_env}
     depends_on:
       db:
         condition: service_healthy
@@ -58,7 +58,7 @@ services:
       - "127.0.0.1:3002:3000"
     environment:
       GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-clubGrafana_2026}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?thieu_trong_env}
     volumes:
       - club_grafana_data:/var/lib/grafana
     depends_on:
