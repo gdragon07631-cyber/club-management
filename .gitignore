@@ -4,3 +4,5 @@ npm-debug.log*
 .DS_Store
 club_db_backup.sql
 club_db_backup.sql
+club_db_backup.sql
+nginx/certs/*.key
